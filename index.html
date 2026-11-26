@@ -198,6 +198,12 @@ $('f').onsubmit=async e=>{
   e.preventDefault();const m=$('fmsg');
   const pk=$('pack').value;
   const doc={action:'add',franchise:$('franchise').value.trim(),email:$('email').value.trim(),url:$('url').value.trim(),title:$('title').value.trim(),location:$('location').value.trim(),pack:pk,wantedStart:$('start').value,comment:$('comment').value.trim()};
+  if(FORM.action){
+    const fd=new URLSearchParams();Object.keys(FORM.entries).forEach(k=>fd.append(FORM.entries[k],doc[k]||''));
+    $('send').disabled=true;
+    try{await fetch(FORM.action,{method:'POST',mode:'no-cors',body:fd});m.className='msg';m.textContent="Demande envoyée. Marie Barillé la traitera prochainement.";m.hidden=false;$('f').reset();upd()}
+    catch(x){m.className='msg err';m.textContent="Envoi impossible pour le moment. Réessayez ou écrivez à "+CONTACT_EMAIL+".";m.hidden=false}
+    $('send').disabled=false;return}
   if(!API_URL){
     const body=["Franchisé : "+doc.franchise,"E-mail : "+doc.email,"Lien de l'annonce : "+doc.url,"Poste : "+doc.title,"Lieu : "+doc.location,"Formule : "+PACKS[pk].l+" ("+PACKS[pk].p+" €)","Démarrage souhaité : "+doc.wantedStart,"Commentaire : "+doc.comment].join("\n");
     location.href="mailto:"+CONTACT_EMAIL+"?subject="+encodeURIComponent("Demande de sponsorisation — "+doc.franchise)+"&body="+encodeURIComponent(body);
@@ -274,6 +280,7 @@ $('rcsv').onclick=async()=>{
   try{await d.save({filename:'resultats-sponsorisation.csv',data:'﻿'+rows.map(r=>r.map(q).join(';')).join('\n')})}catch(e){if(e&&e.code!=='declined'){m.textContent="Export impossible.";m.hidden=false;setTimeout(()=>m.hidden=true,5000)}}
 };
 const API_URL="";
+const FORM={action:"https://docs.google.com/forms/d/e/1FAIpQLSe4cjqNBcN_n7Il2nLUhq11Czfp5Hd5tRMIpRWZ5Z6IeZqOgQ/formResponse",entries:{franchise:"entry.633374662",email:"entry.1495737321",url:"entry.568917505",title:"entry.493790837",location:"entry.1059155300",pack:"entry.1090536312",wantedStart:"entry.206794757",comment:"entry.461949904"}};
 const CONTACT_EMAIL="mbarille@indeed.com";
 const dl=async({filename,data})=>{const b=new Blob([data],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=filename;document.body.appendChild(a);a.click();a.remove()};
 function apply(D){
