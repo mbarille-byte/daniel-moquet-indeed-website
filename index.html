@@ -389,8 +389,13 @@ $('f').onsubmit=async e=>{
   const doc={action:'add',franchise:$('franchise').value.trim(),email:$('email').value.trim(),url:$('url').value.trim(),title:$('title').value.trim(),location:$('location').value.trim(),pack:pk,wantedStart:$('start').value,comment:$('comment').value.trim()};
   if(FORM.action){
     const fd=new URLSearchParams();Object.keys(FORM.entries).forEach(k=>fd.append(FORM.entries[k],doc[k]||''));
+    const fdCal=new URLSearchParams();Object.keys(FORM_CAL.entries).forEach(k=>fdCal.append(FORM_CAL.entries[k],doc[k]||''));
     $('send').disabled=true;
-    try{await fetch(FORM.action,{method:'POST',mode:'no-cors',body:fd});m.className='msg';m.textContent="Demande envoyée. Marie Barillé la traitera prochainement.";m.hidden=false;$('f').reset();upd()}
+    try{
+      await fetch(FORM.action,{method:'POST',mode:'no-cors',body:fd});
+      await fetch(FORM_CAL.action,{method:'POST',mode:'no-cors',body:fdCal});
+      m.className='msg';m.textContent="Demande envoyée. Marie Barillé la traitera prochainement.";m.hidden=false;$('f').reset();upd()
+    }
     catch(x){m.className='msg err';m.textContent="Envoi impossible pour le moment. Réessayez ou écrivez à "+CONTACT_EMAIL+".";m.hidden=false}
     $('send').disabled=false;return}
   if(!API_URL){
@@ -470,6 +475,7 @@ $('rcsv').onclick=async()=>{
 };
 const API_URL="";
 const FORM={action:"https://docs.google.com/forms/d/e/1FAIpQLSe4cjqNBcN_n7Il2nLUhq11Czfp5Hd5tRMIpRWZ5Z6IeZqOgQ/formResponse",entries:{franchise:"entry.633374662",email:"entry.1495737321",url:"entry.568917505",title:"entry.493790837",location:"entry.1059155300",pack:"entry.1090536312",wantedStart:"entry.206794757",comment:"entry.461949904"}};
+const FORM_CAL={action:"https://docs.google.com/forms/d/e/1FAIpQLSf-gEnnq6K2An2CjNDbuMa5O7Mq7iSCsGePX-IYDczbzhYAfw/formResponse",entries:{franchise:"entry.41041496",email:"entry.292398378",url:"entry.560251331",title:"entry.37143719",location:"entry.1191740948",pack:"entry.1829093093",wantedStart:"entry.1619011457",comment:"entry.1493074879"}};
 const CONTACT_EMAIL="mbarille@indeed.com";
 const dl=async({filename,data})=>{const b=new Blob([data],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=filename;document.body.appendChild(a);a.click();a.remove()};
 function apply(D){
